@@ -31,6 +31,16 @@ const taskReducer = (state, action) => {
         alertClass: 'success',
       };
 
+    case 'OPEN_EDIT_MODAL':
+      return {
+        ...state,
+        isEditModalOpen: true,
+        taskID: action.payload,
+        modalTitle: 'Edit Task',
+        modalMsg: 'You are about to edit this task',
+        modalActionText: 'EDIT',
+      };
+
     default:
       return state;
   }
@@ -50,6 +60,11 @@ const TaskManagerReducer = () => {
     isAlertOpen: false,
     alertContent: 'This is an alert',
     alertClass: 'danger',
+    isEditModalOpen: false,
+    isDeleteModalOpen: false,
+    modalTitle: 'Delete Task',
+    modalMsg: ' You are about to delete this task',
+    modalActionText: 'OK',
   };
 
   const [state, dispatch] = useReducer(taskReducer, initialState);
@@ -91,11 +106,20 @@ const TaskManagerReducer = () => {
     }
   };
 
+  const openEditModal = (id) => {
+    dispatch({
+      type: 'OPEN_EDIT_MODAL',
+      payload: id,
+    });
+  };
+
   const handleEditTask = (id) => {};
 
   const handleDeleteTask = (id) => {};
 
   const handleCompleteTask = (id) => {};
+
+  const closeModal = () => {};
 
   return (
     <div className='--bg-primary '>
@@ -107,7 +131,16 @@ const TaskManagerReducer = () => {
         />
       )}
 
-      {/* <Confirm /> */}
+      {state.isEditModalOpen && (
+        <Confirm
+          modalTitle={state.modalTitle}
+          modalMsg={state.modalMsg}
+          modalActionText={state.modalActionText}
+          modalAction={handleEditTask}
+          onCloseModal={closeModal}
+        />
+      )}
+
       <h1 className='--text-center --text-light'>Task Manager Reducer</h1>
       <div className='--flex-center --p'>
         <div className='--card --bg-light --width-500px --p --flex-center'>
@@ -134,7 +167,7 @@ const TaskManagerReducer = () => {
               />
             </div>
             <button className='--btn --btn-success --btn-block'>
-              {/* NOT SURE IF NEEDED - CHECK */}
+              {/* not sure if needed ??  */}
               {state.iEditing ? 'Edit Task' : 'Save Task'}
             </button>
           </form>{' '}
@@ -155,7 +188,7 @@ const TaskManagerReducer = () => {
                   <Task
                     key={id}
                     {...task}
-                    editTask={handleEditTask}
+                    editTask={openEditModal}
                     deleteTask={handleDeleteTask}
                     completeTask={handleCompleteTask}
                   />
