@@ -41,6 +41,13 @@ const taskReducer = (state, action) => {
         modalActionText: 'EDIT',
       };
 
+    case 'EDIT_TASK':
+      return {
+        ...state,
+        taskID: action.payload,
+        iEditing: true,
+      };
+
     default:
       return state;
   }
@@ -113,7 +120,16 @@ const TaskManagerReducer = () => {
     });
   };
 
-  const handleEditTask = (id) => {};
+  const handleEditTask = () => {
+    const id = state.taskID;
+    dispatch({
+      type: 'EDIT_TASK',
+      payload: id,
+    });
+    const thisTask = state.tasks.find((task) => task.id === id);
+    setName(thisTask.name);
+    setDate(thisTask.date);
+  };
 
   const handleDeleteTask = (id) => {};
 
