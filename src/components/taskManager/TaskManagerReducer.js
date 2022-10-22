@@ -35,6 +35,7 @@ const taskReducer = (state, action) => {
       return {
         ...state,
         isEditModalOpen: true,
+
         taskID: action.payload,
         modalTitle: 'Edit Task',
         modalMsg: 'You are about to edit this task',
@@ -44,14 +45,34 @@ const taskReducer = (state, action) => {
     case 'EDIT_TASK':
       return {
         ...state,
-        taskID: action.payload,
-        iEditing: true,
+        isEditing: true,
       };
 
     case 'CLOSE_MODAL':
       return {
         ...state,
         isEditModalOpen: false,
+      };
+
+    case 'UPDATE_TASK':
+      const updatedTask = action.payload;
+      const id = action.payload.id;
+
+      // find the task index
+      const taskIndex = state.tasks.findIndex((task) => {
+        return task.id === id;
+      });
+
+      // replace the task by its index
+      if (taskIndex !== -1) {
+        state.tasks[taskIndex] = updatedTask;
+      }
+      return {
+        ...state,
+        isEditing: false,
+        isAlertOpen: true,
+        alertContent: 'Task edited successfully',
+        alertClass: 'success',
       };
 
     default:
@@ -69,7 +90,7 @@ const TaskManagerReducer = () => {
   const initialState = {
     tasks,
     taskID: null,
-    iEditing: false,
+    isEditing: false,
     isAlertOpen: false,
     alertContent: 'This is an alert',
     alertClass: 'danger',
@@ -101,7 +122,34 @@ const TaskManagerReducer = () => {
         type: 'EMPTY_FIELD',
       });
     }
+
+    if (name && date && state.isEditing) {
+      const updatedTask = {
+        id: state.taskID,
+        name,
+        date,
+        complete: false,
+      };
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: updatedTask,
+      });
+      setName('');
+      setDate('');
+      // saving to local storage
+      setTasks(
+        tasks.map((task) => {
+          if (task.id === updatedTask.id) {
+            return { ...task, name, date, complete: false };
+          }
+          return task;
+        })
+      );
+      return;
+    }
     if (name && date) {
+      console.log('ADD_TASK...');
+      console.log(state);
       const newTask = {
         id: Date.now(),
         name,
@@ -194,8 +242,7 @@ const TaskManagerReducer = () => {
               />
             </div>
             <button className='--btn --btn-success --btn-block'>
-              {/* not sure if needed ??  */}
-              {state.iEditing ? 'Edit Task' : 'Save Task'}
+              {state.isEditing ? 'Edit Task' : 'Save Task'}
             </button>
           </form>{' '}
         </div>
