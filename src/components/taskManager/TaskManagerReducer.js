@@ -59,9 +59,9 @@ const taskReducer = (state, action) => {
         isEditing: true,
       };
 
-    case 'DELETE_TASK':
-      const idx = action.payload;
-      const newTasks = state.tasks.filter((task) => task.id !== idx);
+    case 'DELETE_TASK': {
+      const id = action.payload;
+      const newTasks = state.tasks.filter((task) => task.id !== id);
       return {
         ...state,
         tasks: newTasks,
@@ -69,6 +69,7 @@ const taskReducer = (state, action) => {
         alertContent: 'Task deleted successfully',
         alertClass: 'success',
       };
+    }
 
     case 'CLOSE_MODAL':
       return {
@@ -97,6 +98,31 @@ const taskReducer = (state, action) => {
         alertContent: 'Task edited successfully',
         alertClass: 'success',
       };
+
+    case 'COMPLETE_TASK': {
+      const id = action.payload;
+
+      // find the task index
+      const taskIndex = state.tasks.findIndex((task) => {
+        return task.id === id;
+      });
+
+      let updatedTask = {
+        id,
+        name: state.tasks[taskIndex].name,
+        date: state.tasks[taskIndex].name,
+        complete: true,
+      };
+      if (taskIndex !== -1) {
+        state.tasks[taskIndex] = updatedTask;
+      }
+      return {
+        ...state,
+        isAlertOpen: true,
+        alertContent: 'Task completed',
+        alertClass: 'success',
+      };
+    }
 
     default:
       return state;
@@ -229,7 +255,22 @@ const TaskManagerReducer = () => {
     closeModal();
   };
 
-  const handleCompleteTask = (id) => {};
+  const handleCompleteTask = (id) => {
+    dispatch({
+      type: 'COMPLETE_TASK',
+      payload: id,
+    });
+
+    //saving to local storage
+    setTasks(
+      tasks.map((task) => {
+        if (task.id === id) {
+          return { ...task, complete: true };
+        }
+        return task;
+      })
+    );
+  };
 
   const closeModal = () => {
     dispatch({
