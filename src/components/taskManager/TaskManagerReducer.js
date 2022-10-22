@@ -48,6 +48,12 @@ const taskReducer = (state, action) => {
         iEditing: true,
       };
 
+    case 'CLOSE_MODAL':
+      return {
+        ...state,
+        isEditModalOpen: false,
+      };
+
     default:
       return state;
   }
@@ -129,13 +135,18 @@ const TaskManagerReducer = () => {
     const thisTask = state.tasks.find((task) => task.id === id);
     setName(thisTask.name);
     setDate(thisTask.date);
+    closeModal();
   };
 
   const handleDeleteTask = (id) => {};
 
   const handleCompleteTask = (id) => {};
 
-  const closeModal = () => {};
+  const closeModal = () => {
+    dispatch({
+      type: 'CLOSE_MODAL',
+    });
+  };
 
   return (
     <div className='--bg-primary '>
