@@ -59,6 +59,17 @@ const taskReducer = (state, action) => {
         isEditing: true,
       };
 
+    case 'DELETE_TASK':
+      const idx = action.payload;
+      const newTasks = state.tasks.filter((task) => task.id !== idx);
+      return {
+        ...state,
+        tasks: newTasks,
+        isAlertOpen: true,
+        alertContent: 'Task deleted successfully',
+        alertClass: 'success',
+      };
+
     case 'CLOSE_MODAL':
       return {
         ...state,
@@ -207,6 +218,15 @@ const TaskManagerReducer = () => {
 
   const handleDeleteTask = () => {
     const id = state.taskID;
+    dispatch({
+      type: 'DELETE_TASK',
+      payload: id,
+    });
+    //saving to local storage
+    const newTasks = tasks.filter((task) => task.id !== id);
+    setTasks(newTasks);
+
+    closeModal();
   };
 
   const handleCompleteTask = (id) => {};
