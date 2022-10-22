@@ -42,6 +42,17 @@ const taskReducer = (state, action) => {
         modalActionText: 'EDIT',
       };
 
+    case 'OPEN_DELETE_MODAL':
+      return {
+        ...state,
+        isDeleteModalOpen: true,
+
+        taskID: action.payload,
+        modalTitle: 'Delete Task',
+        modalMsg: 'You are about to delete this task',
+        modalActionText: 'DELETE',
+      };
+
     case 'EDIT_TASK':
       return {
         ...state,
@@ -52,6 +63,7 @@ const taskReducer = (state, action) => {
       return {
         ...state,
         isEditModalOpen: false,
+        isDeleteModalOpen: false,
       };
 
     case 'UPDATE_TASK':
@@ -186,7 +198,16 @@ const TaskManagerReducer = () => {
     closeModal();
   };
 
-  const handleDeleteTask = (id) => {};
+  const openDeleteModal = (id) => {
+    dispatch({
+      type: 'OPEN_DELETE_MODAL',
+      payload: id,
+    });
+  };
+
+  const handleDeleteTask = () => {
+    const id = state.taskID;
+  };
 
   const handleCompleteTask = (id) => {};
 
@@ -212,6 +233,16 @@ const TaskManagerReducer = () => {
           modalMsg={state.modalMsg}
           modalActionText={state.modalActionText}
           modalAction={handleEditTask}
+          onCloseModal={closeModal}
+        />
+      )}
+
+      {state.isDeleteModalOpen && (
+        <Confirm
+          modalTitle={state.modalTitle}
+          modalMsg={state.modalMsg}
+          modalActionText={state.modalActionText}
+          modalAction={handleDeleteTask}
           onCloseModal={closeModal}
         />
       )}
@@ -263,7 +294,7 @@ const TaskManagerReducer = () => {
                     key={id}
                     {...task}
                     editTask={openEditModal}
-                    deleteTask={handleDeleteTask}
+                    deleteTask={openDeleteModal}
                     completeTask={handleCompleteTask}
                   />
                 );
